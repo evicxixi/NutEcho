@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css"> -->
+    <!-- 使用rem，需另外引入ydui.flexible.js自适应类库 -->
+    <link rel="stylesheet" href="/static/css/ydui.rem.css">
+    <script src="/static/js/ydui.flexible.js"></script>
+
+    <!-- 引入Vue2.x -->
+    <script src="/static/js/vue.min.js"></script>
+    <script src="/static/js/vue-router.js"></script>
+    <!-- 引入组件库 -->
+    <script src="/static/js/ydui.rem.js"></script>
+
+</head>
+<body>
+<div id="app">
+  <h1>Hello App!</h1>
+  <p>
+    <!-- 使用 router-link 组件来导航. -->
+    <!-- 通过传入 `to` 属性指定链接. -->
+    <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
+    <router-link to="/">Go to Foo</router-link>
+    <router-link to="/login">
+        <a href="/login">Go to Bar</a>
+    </router-link>
+  </p>
+  <!-- 路由出口 -->
+  <!-- 路由匹配到的组件将渲染在这里 -->
+  <router-view></router-view>
+<!--     <yd-layout>
+        <navbar></navbar>
+        <router-view></router-view>
+        <tabbar></tabbar>
+    </yd-layout> -->
+</div>
+
+
+</body>
+<!-- 1. 引入用于audio录音的Recorder.js -->
+<script src="/static/js/Recorder.js"></script>
+<script src="/static/router/index.js"></script>
+<!-- <script src="/static/router/index.js"></script> -->
+<script>
+
+const http = 'http://0.0.0.0:5000/'
+const wss = 'ws://0.0.0.0:5000/'
+// const wss = 'ws://127.0.0.1:5000/'
+// const wss = 'ws://192.168.11.78:5000/'
+
+
+
+
+var get_file = http + "get_file/"; // nutbot返回的答案语音文件地址
+var ws = new WebSocket(wss + 'echo/nut');  //建立socket连接
+var audio_record = null; // 录音对象 开辟一个储存audio数据的空间
+var audio_obj = new AudioContext(); // 浏览器打开麦克风的对象（不能录音） 实现录音功能需要Recorder.js
+
+
+
+// 此段属舶来品 #################
+// 获取各种浏览器的media对象
+navigator.getUserMedia = (navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia);
+
+navigator.getUserMedia({audio: true}, create_stream, function (err) {
+    // 使用获取到的媒体对象
+    // {audio: true} 打开audio的访问
+    // create_stream 创建一个媒体流容器
+    console.log(err)
+});
+
+
+function create_stream(user_media){
+    // 创建一个媒体流容器 用来记录媒体内容
+    var stream_input = audio_obj.createMediaStreamSource(user_media);
+    // 将这个容器传给Recorder
+    audio_record = new Recorder(stream_input);
+}
+// 此段属舶来品 #################
+
+
+
+// 开始录音
+function audio_start(){
+    console.log('audio_start')
+    audio_record.record()
+}
+
+// 向socket的server端发送录音数据流
+function get_audio() {
+    audio_record.exportWAV(function (wav_file) {
+        ws.send(wav_file);
+    })
+}
+
+// 停止录音 发送到server 并清空录音对象
+function audio_stop(){
+    console.log('audio_stop')
+    audio_record.stop();    // 停止录音
+
+    // // 向socket的server端发送录音数据流
+    // audio_record.exportWAV(function (wav_file) {
+    //     ws.send(wav_file);
+    // })
+
+    get_audio()
+
+    // 清空录音对象
+    audio_record.clear();
+}
+
+// 若server端传回回答语音文件名 拼接为获取语音文件数据流的类似接口地址 设置给audio的html标签进行调用（达到自动播放的目的）
+ws.onmessage = function(data){
+    console.log(get_file);
+    console.log(data);
+    console.log(data.data);
+    document.getElementById('player').src = get_file + data.data;
+}
+
+
+</script>
+</html>

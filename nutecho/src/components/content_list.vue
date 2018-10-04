@@ -1,26 +1,42 @@
 <template>
-<div class="weui-panel weui-panel_access">
-    <div class="weui-panel__hd">content_current {{content_current}}</div>
-    <div class="weui-panel__bd">
-        
-        <!-- router循环开始 -->
-        <router-link v-for="content in content_list" to="/content_current" v-on:click="current(content.content_id)" class="weui-media-box weui-media-box_appmsg">
-            <div class="weui-media-box__hd">
+<div>
+    <h1 style="text-align: center;">Content</h1>
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">Music List</div>
+        <div class="weui-panel__bd">
+            
+            <!-- router循环开始 -->
+    <!--         <router-link v-for="content in content_list" to="/content_current" v-on:click="current(content.content_id)" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
 
-                <!-- 标签内模板语法需用v-bind（支持字符串拼接） -->
-                <img class="weui-media-box__thumb" v-bind:src="http + 'get_file/' + content.content_id + '.jpg' " >
-            </div>
-            <div class="weui-media-box__bd">
-                <h4 class="weui-media-box__title">{{ content.title }}</h4>
-                <p class="weui-media-box__desc">{{ content.author }}</p>
-            </div>
-        </router-link>
-    </div>
-    <div class="weui-panel__ft">
-        <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
-            <div class="weui-cell__bd">查看更多</div>
-            <span class="weui-cell__ft"></span>
-        </a>    
+                    标签内模板语法需用v-bind（支持字符串拼接）
+                    <img class="weui-media-box__thumb" v-bind:src="http + 'get_file/' + content.content_id + '.jpg' " >
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ content.title }}</h4>
+                    <p class="weui-media-box__desc">{{ content.author }}</p>
+                </div>
+            </router-link> -->
+
+            <a v-for="content in content_list" v-on:click="current(content.content_id)" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
+
+                    <!-- 标签内模板语法需用v-bind（支持字符串拼接） -->
+                    <img class="weui-media-box__thumb" v-bind:src="http + 'get_file/' + content.content_id + '.jpg' " >
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ content.title }}</h4>
+                    <p class="weui-media-box__desc">{{ content.author }}</p>
+                </div>
+                
+            </a>
+        </div>
+        <div class="weui-panel__ft">
+            <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+                <div class="weui-cell__bd">查看更多</div>
+                <span class="weui-cell__ft"></span>
+            </a>    
+        </div>
     </div>
 </div>
 </template>
@@ -35,7 +51,7 @@ export default {
     name: "content_list",
     data:function () {
         return {
-            http : 'http://0.0.0.0:5000/',
+            http : this.$store.state.http,
             content_list:[2,3,4],
         }
     },
@@ -70,6 +86,7 @@ export default {
             // console.log('content_id',content_id);
             // 提交到store
             this.$store.commit('content',content_id);
+            this.$router.push('/content_current');
         },
     }
 }

@@ -39,6 +39,8 @@ weui
     
 vue-svg-icon
     最开始使用Vue-Awesome,配置失败，后改用vue-svg-icon
+
+npm install --save js-md5
 ~~~
 
 
@@ -72,10 +74,10 @@ aipnlp.py 语义识别相关
 ~~~
 <debug> @: 无效时改回用v-on
 
-标签内模板语法需用v-bind（支持字符串拼接）
+# 标签内模板语法需用v-bind（支持字符串拼接）
 <img class="weui-media-box__thumb" v-bind:src="http + 'get_file/' + content.content_id + '.jpg' " >
 
-这里的属性content_list更新需要改用箭头函数（未完成)
+# 这里的属性content_list更新需要改用箭头函数（未完成)
 data:function () {
     return {
         http : 'http://0.0.0.0:5000/',
@@ -89,15 +91,46 @@ mounted: function () {
     })
 },
 
-组件从store中取值：
+# 组件从store中取值：
 因data中仅能存放明确的值，从store中取值需放在computed中。
 ~~~
 
 20180925
 ~~~
-{__ob__: Observer}
+# {__ob__: Observer}
 A组件向store仓库的content_list字段提交一个值后 然后在A组件可以正常取到这个值
 但是在B组件中取content_list字段的值  一直是打印{__ob__: Observer}
 备注：大坑 搞了我整整一天 原来是vue单页面应用不能在两个浏览器窗口分别赋值 与 取值。
 在同一个页面赋值在同一个页面取值没问题（不按是否同一个组件）。
 ~~~
+
+20180926
+~~~
+项目从 https://github.com/evicxixi/NutApp 迁移到 https://github.com/evicxixi/NutEcho
+
+# 项目目录移动之后注意事项：
+须删除 node_modules 文件夹，然后执行 npm install，即可正常启动项目。
+
+# 改造Vue路由 在跳转路由之前进行一些操作
+# 在html的a标签中v-bind:click="to_link" 来代替router—link
+to_link(content_id){
+    this.current(content_id);    # 跳转之前的操作
+    this.$router.push('/content_current');    # 跳转link
+}
+~~~
+
+20181004
+<funish> verify() 校验设备
+
+<funish> echo_add() 绑定设备与用户
+    this.$router.push('/person');    # 路由跳转
+    this.$router.go(0);    //刷新路由
+    window.localStorage.getItem('user');    // 储存数据时可使用JSON进行数据格式转换
+<finish> 全局toast组件
+    共同调用$store中的msg_toast，通过赋值与clear，切换toast显示状态。
+<funish> echo_list() 查询并返回当前用户绑定的所有echo设备。
+    pymongo find() 返回的是一个Cursor或Bson
+    data = list(data)
+    data = dumps(data)
+    data = json.loads(data)
+<bug> echo_list 首次访问页面不能显示，需跳转其他页面再跳转回来才显示，疑为生命周期的缘故。

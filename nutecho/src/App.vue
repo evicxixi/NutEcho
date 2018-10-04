@@ -1,31 +1,36 @@
 <template>
   <div id="app">
-    <lhead/>
-    <!-- <Search/> -->
+    <nut_head/>
+    <!-- <search/> -->
     <!-- <router-view/> -->
-    <Tapbar/>
-    <!-- <foot/> -->
+    <tapbar/>
+    <foot/>
   </div>
 </template>
 
 <script>
-// import 'vue-awesome/dist/css/bootstrap.min.css'
-// import '/node_moudules/vue-awesome/dist/vue-awesome.js'
-import lhead from '@/components/head'
-import foot from './components/foot'
-import Tapbar from './components/tapbar'
+import '@/css/main.css'
+import record from '@/js/record.js'
+import weui from '@/js/weui.js'
+import nut_head from '@/components/head'
+import foot from '@/components/foot'
+import tapbar from '@/components/tapbar'
+import login from '@/components/login'
+import toast from '@/components/toast'
 // import content_current from '@/components/content'
-// import Search from './components/search'
+import search from './components/search'
 // import Footer from './components/Foot'
 export default {
   name: 'App',
   components:{
-      lhead,
-      Tapbar,
+      nut_head,
+      tapbar,
       foot,
+      login,
+      toast,
       // content_current,
       // Echo,
-      // Search,
+      search,
     }
 }
 </script>
@@ -35,7 +40,7 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+  // text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }
