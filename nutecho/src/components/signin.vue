@@ -10,25 +10,25 @@
         <div class="weui-cell">
             <div class="weui-cell__hd"><label class="weui-label">Username</label></div>
             <div class="weui-cell__bd">
-                <input id="username" class="weui-input" type="text" placeholder="Username"/>
+                <input id="username" class="weui-input" type="text" placeholder="Username" value="rednut"/>
             </div>
         </div>
         <div class="weui-cell">
             <div class="weui-cell__hd"><label class="weui-label">Password</label></div>
             <div class="weui-cell__bd">
-                <input id="password" class="weui-input" type="password" placeholder="Password"/>
+                <input id="password" class="weui-input" type="password" placeholder="Password" value="1"/>
             </div>
         </div>
         <div class="weui-cell">
             <div class="weui-cell__hd"><label class="weui-label">Re-Password</label></div>
             <div class="weui-cell__bd">
-                <input id="re_password" class="weui-input" type="password" placeholder="Re-Password"/>
+                <input id="re_password" class="weui-input" type="password" placeholder="Re-Password" value="1"/>
             </div>
         </div>
         <div class="weui-cell">
             <div class="weui-cell__hd"><label class="weui-label">Nickname</label></div>
             <div class="weui-cell__bd">
-                <input id="nickname" class="weui-input" type="text" placeholder="Nickname"/>
+                <input id="nickname" class="weui-input" type="text" placeholder="Nickname" value="红果"/>
             </div>
         </div>
     </div>
@@ -74,7 +74,8 @@ export default {
     name: 'signin',
     data () {
         return {
-            http : this.$store.state.http,
+            // http : this.$store.state.http,
+            http : 'http://0.0.0.0:5000/',
         }
     },
     components: { 

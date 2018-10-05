@@ -18,6 +18,7 @@ Vue.use(Vuex)  // 引入Vuex 第2步
 const store = new Vuex.Store({
     state:{
         http : 'http://0.0.0.0:5000/API/',
+        wss : 'ws://0.0.0.0:5000/API/',
         content_list:{},
         content_current:{},
         msg_toast:'',
@@ -34,16 +35,16 @@ const store = new Vuex.Store({
         },
         content:function (state,content_id) {
             // body...
-            // state.content_current = content_id;
             var data = state.content_list[content_id];
             state.content_current = data;
-            // state.content_current = JSON.stringify(data);
-            // console.log('state.content_current',typeof(state.content_current),state.content_current);
         },
         login (state,data) {
             // body...
             state.user = data;
             console.log('state.user',typeof(state.user),state.user);
+
+            var ret = window.localStorage.getItem("user");
+            console.log('localStorage user',typeof(ret),ret);
         },
         logout (state,data) {
             // body...
@@ -57,10 +58,11 @@ const store = new Vuex.Store({
             },300)
             setTimeout(()=>{
                 state.msg_toast = "";
-            },2000)
+            },400)
         },
         echo_list(state,data){
             state.echo_list = data;
+            console.log('main state echo_list',typeof(data),data);
         },
     }
 })
@@ -79,12 +81,8 @@ el: '#app',
     data(){
         return {
             msg: 'Welcome to Your Vue.js App',
-            // http : 'http://0.0.0.0:5000/',
         }
     },
-    // props:{
-    //     http : 'http://0.0.0.0:5000/',
-    // },
     components: { 
         App,
     },

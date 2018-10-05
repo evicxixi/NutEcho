@@ -134,3 +134,30 @@ to_link(content_id){
     data = dumps(data)
     data = json.loads(data)
 <bug> echo_list 首次访问页面不能显示，需跳转其他页面再跳转回来才显示，疑为生命周期的缘故。
+
+
+20180906
+<finish> 重整user表的echo_list格式，与echo表的user_list格式。
+
+
+20180905
+echo增加开机键，ws由开机连接改为手动连接。
+若serial存在，并echo的serial也存在，说明合法并已绑定，可以开机(连接ws，以serial为id)。返回RET，包含audio文件名。供echo播放。
+发送音乐给不同的echo。
+新建chat_list、chat页面。
+长按录音并储存本地，可点击播放。
+录音发送到server端。（需要转为Blob对象？），发两次，一次信息，一次Blob对象。（audio标签不支持amr格式）
+
+
+
+
+
+
+
+
+
+
+
+
+
+

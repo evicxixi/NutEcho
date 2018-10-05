@@ -6,7 +6,7 @@ from settings import RET
 import os
 from bson.json_util import dumps
 import json
-
+import bson
 
 im = Blueprint("im", __name__)
 
@@ -116,28 +116,74 @@ def echo_add():
     '''
 
     data = request.json
-    # print('data', type(data), data)
+    print('/echo_add > data', type(data), data)
 
+    # 校验并获取user数据
     db, collection = mongodb.get_db_client(settings.DB, 'user')
-    user_obj = mongodb.find_one(collection, field='username',
-                                value=data.get('master_username'))
+    user_obj = mongodb.find_one(collection, field='_id',
+                                value=data.get('user_id'))
+    if user_obj.get('password'):
+        user_obj.pop('password')    # pop掉敏感数据password
+    if user_obj.get('echo_list'):
+        user_obj.pop('echo_list')    # pop掉无用数据echo_list
+    user_obj['user_remark'] = data.get('user_remark')
     print('user_obj', user_obj)
-    if not user_obj:
-        RET['code'] = -2
+
+    if not user_obj:    # 若当前user异常
+        RET['code'] = -1
         RET['msg'] = '绑定失败，用户不存在！'
         return jsonify(RET)
 
+    print('1.------------')
+    # 1. 向echo数据库添加当前echo数据 并添加user_list（用户列表）
+    # 校验并获取当前echo数据（echo_obj说明此设备已经被绑定用户）
     db, collection = mongodb.get_db_client(settings.DB, 'echo')
-    echo_obj = mongodb.find_one(
-        collection, field='serial', value=data.get('serial'))
-    if not echo_obj:    # 若设备未绑定
-        mongodb.insert_one(collection, data)
-        RET['code'] = 1
-        RET['msg'] = '绑定成功'
-    else:        # 若设备已绑定
-        RET['code'] = -1
-        RET['msg'] = '绑定失败，此设备已绑定其它用户！'
+    echo_obj = mongodb.find_one(collection, field='serial',
+                                value=data.get('serial'))
 
+    print('1.1------------')
+    if not echo_obj:    # 1.1 若设备未绑定 向echo数据库插入当前echo数据
+        data['user_list'] = []
+        collection.insert_one(data)  # 向echo数据库中插入当前echo数据（含空的user_list）
+
+    # 若设备已绑定
+    echo_obj = mongodb.find_one(collection, field='serial',
+                                value=data.get('serial'))
+
+    # 构造当前echo绑定的所有user的_id的list
+    user_id_list = echo_obj.get('user_list')
+    user_id_list = [str(user['_id']) for user in user_id_list]
+    print('user_id_list', user_id_list)
+
+    if data.get('user_id') in user_id_list:    # 若当前user已在当前echo设备的user_list中
+        RET['code'] = -2
+        RET['msg'] = '您已绑定过此echo设备!'
+        return jsonify(RET)
+
+    print('1.2------------')
+    # 1.2 在当前echo的user_lis字段插入新user
+    collection.update_one({'serial': data['serial']}, {
+        "$push": {'user_list': user_obj}})
+
+    print('2.--------------------------------')
+    # 2. 向当前user数据库添加echo_list数据
+    # 2.1 构造当前user绑定的echo列表
+
+    # 当前待绑定的echo数据中pop掉无用数据
+    del echo_obj['user_list']
+    if echo_obj.get('user_id'):
+        echo_obj.pop('user_id')
+    if echo_obj.get('user_remark'):
+        echo_obj.pop('user_remark')
+    print('echo_obj 当前待绑定的echo数据中pop掉无用数据', type(echo_obj), echo_obj)
+
+    # 2.2 更新user的echo_list
+    db, collection = mongodb.get_db_client(settings.DB, 'user')
+    collection.update_one({'_id': bson.ObjectId(data['user_id'])}, {
+                          '$push': {'echo_list': echo_obj}})
+
+    RET['code'] = 1
+    RET['msg'] = '绑定成功!'
     return jsonify(RET)
 
 
@@ -147,22 +193,21 @@ def echo_list():
     1. 绑定echo设备并到用户。
 
     '''
-
     data = request.json
     # print('data', type(data), data)
 
-    db, collection = mongodb.get_db_client(settings.DB, 'echo')
-    echo_list = collection.find({'master_username': data.get('username')})
+    # 查询当前user数据
+    db, collection = mongodb.get_db_client(settings.DB, 'user')
+    user_obj = mongodb.find_one(
+        collection, field='_id', value=data.get('_id'))
+    # print('echo_list > user_obj', type(user_obj), user_obj)
 
-    data = list(echo_list)
-    # print('data list', type(data), data)
-    data = dumps(data)
-    # print('dumps(data)', type(data), data)
-    data = json.loads(data)
-    # print('json.loads', type(data), data)
-    RET['data'] = data
+    # 从当前user数据中提取echo_list数据
+    echo_list = user_obj.get('echo_list')
+    # print('echo_list > echo_list', type(echo_list), echo_list)
+
+    RET['data'] = echo_list
     RET['code'] = 1
     RET['msg'] = 'ok'
 
     return jsonify(RET)
-    # return RET

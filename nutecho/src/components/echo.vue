@@ -50,8 +50,7 @@ export default {
     data:function () {
         return {
             http : this.$store.state.http,
-            wss : 'ws://0.0.0.0:5000/',
-            // ws : new WebSocket(wss + 'echo/nut');  //建立socket连接
+            wss : this.$store.state.wss,
             audio_record : '',
         }
     },
@@ -64,16 +63,14 @@ export default {
     // created:function (){
     // mounted:() => {
     mounted:function(){
-        const http = 'http://0.0.0.0:5000/'
-        const wss = 'ws://0.0.0.0:5000/'
-        // const wss = 'ws://127.0.0.1:5000/'
-        // const wss = 'ws://192.168.11.78:5000/'
+        var user = window.localStorage.getItem('user');
+        console.log('user',typeof(user),user);
 
-
-        var get_file = http + "get_file/"; // nutbot返回的答案语音文件地址
-        var ws = new WebSocket(wss + 'echo/nut');  //建立socket连接
+        var get_file = this.http + "get_file/"; // nutbot返回的答案语音文件地址
+        var ws = new WebSocket(this.wss + 'echo/nut');  //建立socket连接
         var audio_record = null; // 录音对象 开辟一个储存audio数据的空间
         var audio_obj = new AudioContext(); // 浏览器打开麦克风的对象（不能录音） 实现录音功能需要Recorder.js
+        // this.ws = ws;
 
 
 
@@ -105,7 +102,7 @@ export default {
         // 若server端传回回答语音文件名 拼接为获取语音文件数据流的类似接口地址 设置给audio的html标签进行调用（达到自动播放的目的）
         ws.onmessage = function(data){
             console.log(get_file);
-            console.log(data);
+            // console.log(data);
             console.log(data.data);
             document.getElementById('player').src = get_file + data.data;
         }
@@ -121,9 +118,11 @@ export default {
             console.log('audio_stop')
             this.audio_record.stop();    // 停止录音
 
+            var _this = this;
+
             // 向socket的server端发送录音数据流
             this.audio_record.exportWAV(function (wav_file) {
-                ws.send(wav_file);
+                _this.ws.send(wav_file);
             })
 
             // get_audio()

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, send_file
 from flask import jsonify
 from service import mongodb
 import settings
+from settings import RET
 import bson
 from blueprint import collector, im
 
@@ -45,29 +46,21 @@ def login():
     user_obj = mongodb.find_one(collection, field='username', value=username)
     # print('user_obj', type(user_obj), user_obj)
 
+    RET['data'] = None
     if not user_obj:
-        data = {
-            'username': None,
-            'nickname': None,
-            'msg': '登录失败 用户名不存在！',
-            'code': -2,
-        }
+        RET['code'] = -2
+        RET['msg'] = '登录失败 用户名不存在！'
     else:
         if not password == user_obj.get('password'):
-            data = {
-                'username': user_obj.get('username'),
-                'nickname': user_obj.get('nickname'),
-                'msg': '登录失败 密码错误！',
-                'code': -1,
-            }
+            RET['code'] = -1
+            RET['msg'] = '登录失败 密码错误！'
         elif password == user_obj.get('password'):
-            data = {
-                'username': user_obj.get('username'),
-                'nickname': user_obj.get('nickname'),
-                'msg': '登录成功！',
-                'code': 1,
-            }
-    return jsonify(data)
+
+            user_obj.pop('password')    # 删除密码键值
+            RET['code'] = 1
+            RET['msg'] = '登录成功！'
+            RET['data'] = user_obj
+    return jsonify(RET)
 
 
 @app.route('/signin', methods=['GET', 'POST'])

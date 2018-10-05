@@ -158,7 +158,9 @@ export default {
             return user
         },
         echo_list(){
-            return this.$store.state.echo_list;
+            var data = this.$store.state.echo_list;
+            console.log('echo_list',typeof(data),data)
+            return data
         },
     },
     methods:{
@@ -169,27 +171,7 @@ export default {
     },
     // created(){
     mounted(){
-        // 初始化我的echo设备信息
-        var data = this.user;
-        axios.post(this.http + 'echo_list', data).then((data) => {
-                console.log('echo_list > data.data',typeof(data.data),data.data);
-                console.log('echo_list > data.data.data',typeof(data.data.data),data.data.data);
-                var echo_list = data.data.data;
-                // var echo_list = JSON.parse(echo_list);
-                // var echo_list = JSON.stringify(echo_list);
-                // var echo_list = JSON.parse(data.data.data);
-                if (data.data['code'] == 1){
-                    this.$store.commit('echo_list',echo_list);
-                }
-                // else{
-                //     this.$store.commit('msg_toast',data.data['msg']);
-                // }
-            }).catch(function (error) {
-                console.log('error',typeof(error),error);
-            }
-        );
-
-    }
+    },
 }
 </script>
 </style>

@@ -45,7 +45,7 @@ def find_all(collection):
 
     for index, item in enumerate(data):
         data[index]["_id"] = str(item.get("_id"))
-    print('data', type(data), data)
+    # print('data', type(data), data)
 
     return jsonify(data)
 
@@ -63,9 +63,9 @@ def insert_many(collection, data):
     获取数据表中所有数据并转换为list
     '''
 
-    print('insert_many > data 1', type(data), data)
+    # print('insert_many > data 1', type(data), data)
     data = collection.insert_many(data)
-    print('insert_many > data', type(data), data)
+    # print('insert_many > data', type(data), data)
 
     # return jsonify(data)
     return data

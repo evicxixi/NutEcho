@@ -17,7 +17,7 @@
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">Master</label></div>
                 <div class="weui-cell__bd">
-                    <input id="master_remark" class="weui-input" type="text" placeholder="Master Remark" value="爸爸" />
+                    <input id="user_remark" class="weui-input" type="text" placeholder="Master Remark" value="爸爸" />
                 </div>
             </div>
         </div>
@@ -120,22 +120,23 @@ export default {
             // console.log('signin');            
             // 取值serial字段
             var echo_name = document.getElementById("echo_name").value;
-            var master_remark = document.getElementById("master_remark").value;
+            var user_remark = document.getElementById("user_remark").value;
             var gender_list = document.getElementsByName('radio1')
             for(var i = 0; i < gender_list.length; i++) {
                 if(gender_list[i].checked) {
                     var gender = gender_list[i].value;
                 }
             };
-            var user = window.localStorage.getItem("user");
-            var user = JSON.parse(user);
+            var user_obj = window.localStorage.getItem("user");
+            var user_obj = JSON.parse(user_obj);
             // console.log('user',typeof(user),user);
             var data = {
                 'echo_name': echo_name,
                 'gender': gender,
                 'serial': this.serial,
-                'master_remark': master_remark,
-                'master_username': user['username'],
+                'user_id': user_obj['_id'],
+                'user_remark': user_remark,
+                // 'user_username': user['username'],
             };
             // console.log('data',typeof(data),data);
 
